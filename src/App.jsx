@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { app } from "./services/firebase";
 
 const highlights = [
@@ -32,21 +32,24 @@ const allocations = [
   { label: "Cripto", value: 10 }
 ];
 
-const goals = [
+const initialGoals = [
   {
+    id: "reserva",
     title: "Reserva de emergência",
-    progress: "80%",
-    value: "R$ 32.000 / R$ 40.000"
+    current: 32000,
+    target: 40000
   },
   {
+    id: "viagem",
     title: "Viagem 2025",
-    progress: "45%",
-    value: "R$ 9.000 / R$ 20.000"
+    current: 9000,
+    target: 20000
   },
   {
+    id: "aposentadoria",
     title: "Aposentadoria",
-    progress: "28%",
-    value: "R$ 280k / R$ 1M"
+    current: 280000,
+    target: 1000000
   }
 ];
 
@@ -71,6 +74,44 @@ const alerts = [
 
 export default function App() {
   const firebaseStatus = useMemo(() => (app ? "Conectado" : "Offline"), []);
+  const currencyFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+        maximumFractionDigits: 0
+      }),
+    []
+  );
+  const [goals, setGoals] = useState(() =>
+    initialGoals.map((goal) => ({
+      ...goal,
+      updatedAt: new Date()
+    }))
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setGoals((prevGoals) =>
+        prevGoals.map((goal) => {
+          if (goal.current >= goal.target) {
+            return goal;
+          }
+
+          const increment = Math.round(200 + Math.random() * 800);
+          const nextValue = Math.min(goal.current + increment, goal.target);
+
+          return {
+            ...goal,
+            current: nextValue,
+            updatedAt: new Date()
+          };
+        })
+      );
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="page">
@@ -208,15 +249,35 @@ export default function App() {
           </div>
           <div className="panel">
             <h2>Metas em andamento</h2>
-            <p className="muted">Acompanhe o progresso das metas financeiras.</p>
+            <div className="goal-meta">
+              <p className="muted">Acompanhe o progresso das metas financeiras.</p>
+              <span className="realtime-badge">Tempo real</span>
+            </div>
             <div className="goal-list">
               {goals.map((goal) => (
                 <div key={goal.title} className="goal-card">
-                  <div>
-                    <h3>{goal.title}</h3>
-                    <p>{goal.value}</p>
+                  <div className="goal-details">
+                    <div>
+                      <h3>{goal.title}</h3>
+                      <p>
+                        {currencyFormatter.format(goal.current)} /{" "}
+                        {currencyFormatter.format(goal.target)}
+                      </p>
+                    </div>
+                    <span className="goal-progress">
+                      {Math.round((goal.current / goal.target) * 100)}%
+                    </span>
                   </div>
-                  <span className="goal-progress">{goal.progress}</span>
+                  <div className="goal-bar">
+                    <span
+                      style={{
+                        width: `${Math.round((goal.current / goal.target) * 100)}%`
+                      }}
+                    />
+                  </div>
+                  <span className="goal-update">
+                    Atualizado {goal.updatedAt.toLocaleTimeString("pt-BR")}
+                  </span>
                 </div>
               ))}
             </div>

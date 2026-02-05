@@ -312,9 +312,8 @@ a {
 }
 
 .goal-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  gap: 12px;
   padding: 16px;
   border-radius: 14px;
   background: var(--card);
@@ -325,12 +324,57 @@ a {
   font-size: 0.9rem;
 }
 
+.goal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.realtime-badge {
+  background: rgba(56, 189, 248, 0.2);
+  color: var(--accent);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.goal-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 .goal-progress {
   background: rgba(56, 189, 248, 0.2);
   padding: 6px 12px;
   border-radius: 999px;
   font-weight: 600;
   color: var(--accent);
+}
+
+.goal-bar {
+  background: rgba(248, 250, 252, 0.08);
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.goal-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #22d3ee);
+  transition: width 0.6s ease;
+}
+
+.goal-update {
+  font-size: 0.75rem;
+  color: var(--muted);
 }
 
 .highlight-grid {
